@@ -13,6 +13,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=PORTEUR)
     phone = models.CharField(max_length=20, blank=True)
     is_verified_kyc = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False) 
 
     def __str__(self):
         return f"{self.username} ({self.role})"

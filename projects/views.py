@@ -11,6 +11,13 @@ class ProjectListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Vérifier si l'utilisateur est un investisseur approuvé
+        if request.user.role == 'investisseur' and not request.user.is_approved:
+            return Response(
+                {'error': 'Votre compte investisseur est en attente de validation par un administrateur.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         secteur = request.query_params.get('secteur')
         localisation = request.query_params.get('localisation')
         montant_min = request.query_params.get('montant_min')
@@ -29,6 +36,8 @@ class ProjectListCreateView(APIView):
 
         serializer = ProjectSerializer(projets, many=True)
         return Response(serializer.data)
+    
+    # ... le reste reste identique
 
     def post(self, request):
         if request.user.role != 'porteur':
@@ -72,17 +81,83 @@ class InvestmentCreateView(APIView):
             except Project.DoesNotExist:
                 return Response({'error': 'Projet introuvable ou fermé.'}, status=status.HTTP_404_NOT_FOUND)
 
-            investment = serializer.save(investisseur=request.user, projet=projet)
-            projet.montant_actuel += investment.montant
-            projet.save()
+            # Vérifier si l'investisseur a déjà postulé
+            if Investment.objects.filter(investisseur=request.user, projet=projet).exists():
+                return Response({'error': 'Vous avez déjà postulé à ce projet.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            investment = serializer.save(investisseur=request.user, projet=projet, statut='en_attente')
+            # NE PAS ajouter le montant immédiatement — il faut attendre acceptation
             return Response(InvestmentSerializer(investment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AcceptInvestmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        """Le porteur accepte un investissement"""
+        try:
+            investment = Investment.objects.get(pk=pk, statut='en_attente')
+        except Investment.DoesNotExist:
+            return Response({'error': 'Investissement introuvable ou déjà traité.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Vérifier que l'utilisateur est le porteur du projet
+        if request.user != investment.projet.porteur:
+            return Response({'error': 'Seul le porteur du projet peut accepter les investissements.'}, status=status.HTTP_403_FORBIDDEN)
+
+        investment.statut = 'accepte'
+        investment.save()
+
+        # Ajouter le montant au projet
+        investment.projet.montant_actuel += investment.montant
+        investment.projet.save()
+
+        return Response(InvestmentSerializer(investment).data)
+
+
+class RejectInvestmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        """Le porteur refuse un investissement"""
+        try:
+            investment = Investment.objects.get(pk=pk, statut='en_attente')
+        except Investment.DoesNotExist:
+            return Response({'error': 'Investissement introuvable ou déjà traité.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user != investment.projet.porteur:
+            return Response({'error': 'Seul le porteur du projet peut refuser les investissements.'}, status=status.HTTP_403_FORBIDDEN)
+
+        investment.statut = 'refuse'
+        investment.save()
+        return Response(InvestmentSerializer(investment).data)
 
 
 class MyInvestmentsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        investissements = Investment.objects.filter(investisseur=request.user)
+        """Investissements effectués par l'utilisateur (investisseur)"""
+        if request.user.role == 'investisseur':
+            investissements = Investment.objects.filter(investisseur=request.user)
+            serializer = InvestmentSerializer(investissements, many=True)
+            return Response(serializer.data)
+        return Response({'error': 'Seul un investisseur peut voir ses investissements.'}, status=status.HTTP_403_FORBIDDEN)
+
+
+class ProjectInvestmentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        """Investissements reçus sur un projet (porteur uniquement)"""
+        try:
+            projet = Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            return Response({'error': 'Projet introuvable.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user != projet.porteur:
+            return Response({'error': 'Seul le porteur peut voir les investissements de son projet.'}, status=status.HTTP_403_FORBIDDEN)
+
+        investissements = Investment.objects.filter(projet=projet)
         serializer = InvestmentSerializer(investissements, many=True)
         return Response(serializer.data)

@@ -18,6 +18,7 @@ ALLOWED_HOSTS = [
 
 # ── Applications ──────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
+    'jazzmin',  # ⚠️ DOIT être AVANT django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -128,3 +129,24 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Jazzmin Admin Theme Configuration
+JAZZMIN_SETTINGS = {
+    "site_title": "Golden Invest Admin",
+    "site_header": "Golden Invest",
+    "site_brand": "Golden Invest",
+    "welcome_sign": "Bienvenue sur l'administration Golden Invest",
+    "copyright": "Golden Invest",
+    "search_model": "accounts.User",
+    "show_ui_builder": True,
+    "theme": "darkly",
+    "dark_mode_theme": "darkly",
+    
+    # Menu personnalisé
+    "navigation": [
+        {"name": "Dashboard", "icon": "fas fa-tachometer-alt", "url": "/admin/"},
+        {"name": "Utilisateurs", "icon": "fas fa-users", "model": "accounts.User"},
+        {"name": "Projets", "icon": "fas fa-project-diagram", "model": "projects.Project"},
+        {"name": "Investissements", "icon": "fas fa-chart-line", "model": "projects.Investment"},
+        {"name": "Groupes", "icon": "fas fa-layer-group", "model": "auth.Group"},
+    ],
+}
