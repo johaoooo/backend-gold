@@ -160,3 +160,21 @@ ALLOWED_HOSTS = ['*']  # À restreindre après déploiement
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = '/home/votre_username/backend-gold/static'
+
+# Render deployment
+import os
+import dj_database_url
+
+if os.environ.get('RENDER'):
+    # Disable HTTPS redirect
+    SECURE_SSL_REDIRECT = False
+    
+    # Allow Render host
+    ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+    
+    # Database configuration from DATABASE_URL
+    if 'DATABASE_URL' in os.environ:
+        DATABASES['default'] = dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True
+        )

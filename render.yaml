@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: golden-invest-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn core.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: golden-invest-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://ton-frontend.onrender.com,http://localhost:3000
+
+databases:
+  - name: golden-invest-db
+    plan: free
