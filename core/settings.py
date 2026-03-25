@@ -150,3 +150,13 @@ JAZZMIN_SETTINGS = {
         {"name": "Groupes", "icon": "fas fa-layer-group", "model": "auth.Group"},
     ],
 }
+
+# PythonAnywhere settings
+import os
+
+# Allow PythonAnywhere host
+ALLOWED_HOSTS = ['*']  # À restreindre après déploiement
+
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = '/home/votre_username/backend-gold/static'
