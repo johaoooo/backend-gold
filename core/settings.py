@@ -155,3 +155,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Email configuration
+INSTALLED_APPS.append('anymail')
+EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+ANYMAIL = {
+    "SENDGRID_API_KEY": os.environ.get("SENDGRID_API_KEY"),
+}
+DEFAULT_FROM_EMAIL = "noreply@golden-invest.com"
