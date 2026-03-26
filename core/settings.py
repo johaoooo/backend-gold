@@ -65,19 +65,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # ── Base de données ───────────────────────────────────────────────────────────
-DATABASE_URL = os.environ.get('DATABASE_URL')
+import os
+import dj_database_url
 
-if DATABASE_URL:
-    # Railway fournit DATABASE_URL automatiquement
+# Database configuration
+if 'DATABASE_URL' in os.environ:
     DATABASES = {
         'default': dj_database_url.config(
-            default=DATABASE_URL,
             conn_max_age=600,
-            ssl_require=True,
+            ssl_require=False  # Render free tier ne supporte pas SSL
         )
     }
 else:
-    # Local
+    # Fallback pour le développement local
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
