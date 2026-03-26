@@ -26,7 +26,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ⚠️ Doit rester en PREMIER
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -92,12 +92,34 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
+# Liste des origines autorisées (locale + production Netlify)
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,https://gold-platform.josephdehazounde.workers.dev'
+    'http://localhost:3000,http://localhost:3001,https://effervescent-conkies-b4bf5b.netlify.app'
 ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 # ── Fichiers statiques ────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
@@ -105,7 +127,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ── Allowed Hosts ────────────────────────────────────────────────────────────
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '.railway.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '.railway.app', '.netlify.app']
 
 # ── Jazzmin Admin Theme ───────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
