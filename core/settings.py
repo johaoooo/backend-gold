@@ -92,11 +92,15 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-# Liste des origines autorisées (locale + production Netlify)
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000,http://localhost:3001,https://effervescent-conkies-b4bf5b.netlify.app'
 ).split(',')
+
+# ✅ Autorise tous les sous-domaines Vercel automatiquement
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
