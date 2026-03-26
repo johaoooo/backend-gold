@@ -92,18 +92,8 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://localhost:3001,https://effervescent-conkies-b4bf5b.netlify.app'
-).split(',')
-
-# ✅ Autorise tous les sous-domaines Vercel automatiquement
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*\.vercel\.app$",
-]
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -115,7 +105,6 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -131,7 +120,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ── Allowed Hosts ────────────────────────────────────────────────────────────
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '.railway.app', '.netlify.app']
+ALLOWED_HOSTS = ['*']
 
 # ── Jazzmin Admin Theme ───────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
