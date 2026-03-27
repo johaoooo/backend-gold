@@ -6,7 +6,6 @@ User = get_user_model()
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     
-    # Champs investisseur
     full_name = serializers.CharField(required=False, allow_blank=True)
     birth_date = serializers.DateField(required=False, allow_null=True)
     nationality = serializers.CharField(required=False, allow_blank=True)
@@ -40,7 +39,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        # Extraire les champs investisseur
         investor_fields = [
             'full_name', 'birth_date', 'nationality', 'country_of_residence', 'city',
             'company', 'position', 'investment_experience', 'investment_areas',
@@ -52,12 +50,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         
         user = User.objects.create_user(**user_data)
         
-        # Remplir les champs investisseur
         for field, value in investor_data.items():
             if value:
                 setattr(user, field, value)
         
-        # Si le rôle est investisseur, il doit être approuvé par admin
         if user.role == 'investisseur':
             user.is_approved = False
         else:
@@ -74,6 +70,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'role', 'phone', 'is_verified_kyc', 'is_approved',
             'full_name', 'birth_date', 'nationality', 'country_of_residence', 'city',
             'company', 'position', 'investment_experience', 'investment_areas',
-            'investment_min', 'investment_max', 'investor_type', 'net_worth', 'motivation'
+            'investment_min', 'investment_max', 'investor_type', 'net_worth', 'motivation',
+            'avatar', 'first_name', 'last_name'
         ]
         read_only_fields = ['id', 'is_verified_kyc', 'is_approved']

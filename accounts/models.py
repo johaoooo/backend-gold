@@ -63,3 +63,6 @@ class User(AbstractUser):
     
     def __str__(self):
         return f"{self.username} ({self.role})"
+
+# Ajouter dans la classe User (avant le __str__)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
