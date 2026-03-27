@@ -162,3 +162,7 @@ ANYMAIL = {
     "SENDGRID_API_KEY": os.environ.get("SENDGRID_API_KEY"),
 }
 DEFAULT_FROM_EMAIL = "noreply@golden-invest.com"
+
+# Supprimer l'avertissement SendGrid
+import warnings
+warnings.filterwarnings('ignore', module='anymail')
